@@ -50,4 +50,20 @@ describe("ItemCounter", () => {
     fireEvent.click(buttonSubtract);
     expect(screen.getByText(1)).toBeDefined();
   });
+
+  test("should change to red when count is 1", async () => {
+    const name = "Test Item";
+    const quantity = 1;
+
+    render(<ItemCounter name={name} quantity={quantity} />);
+    expect(screen.getByText(name).style.color).toBe("red");
+  });
+
+  test("should change to black when count is greater than 1", async () => {
+    const name = "Test Item";
+    const quantity = 2;
+
+    render(<ItemCounter name={name} quantity={quantity} />);
+    expect(screen.getByText(name).style.color).toBe("black");
+  });
 });

@@ -83,6 +83,28 @@ describe("MyAwesomeApp", () => {
 })
 ```
 
+## Spy vs Mock
+
+- **`vi.fn()` / mock puro**: función falsa creada desde cero. No hay implementación real detrás salvo la que tú le des. Se usa para reemplazar completamente una dependencia.
+- **`vi.spyOn(obj, "method")`**: "envuelve" un método que ya existe en un objeto/módulo real. Por defecto llama a la implementación real (solo espía llamadas: cuántas veces, con qué argumentos), pero si le encadenas `.mockResolvedValue()` / `.mockImplementation()`, etc., también reemplaza el comportamiento — igual que un mock, con la ventaja de poder restaurarlo con `mockRestore()` y volver al original.
+
+Ejemplo con `useGifs` (hook que depende de la acción `getGifsByQuery`):
+
+```ts
+import * as getGifsByQuery from '../../actions/get-gifs-by-query.action'
+
+vi.spyOn(getGifsByQuery, "getGifsByQuery").mockResolvedValue([]);
+```
+
+Aquí se usa la sintaxis de spy porque hace falta apuntar a una función exportada de un módulo (`import * as ...`), pero al encadenar `.mockResolvedValue()` el comportamiento real queda totalmente reemplazado — en la práctica es un mock.
+
+**Regla práctica: mockea/espía en el límite (boundary) más cercano a lo que estás probando.**
+
+- Test del **hook** (`useGifs`) → spy/mock sobre la acción `getGifsByQuery`. Al hook no le importa cómo se obtienen los gifs, solo que reciba un `Gif[]`. No hace falta tocar axios.
+- Test de la **acción** (`getGifsByQuery`) → mockear con `axios-mock-adapter` a nivel HTTP, dejando correr la lógica real de la acción (armado de params, mapeo de la respuesta de Giphy a `Gif[]`, manejo de errores en el catch). Ahí sí interesa ejecutar el código real y solo falsear la red.
+
+Ambas técnicas conviven en el mismo proyecto: no es que una sea mejor que la otra en general, sino que cada una aísla una capa distinta.
+
 ## Notas / troubleshooting
 
 - Si el error de tipos de `toBeInTheDocument` persiste en el editor después de instalar y configurar todo, reiniciar el servidor de TypeScript de VSCode (`Ctrl+Shift+P` → "TypeScript: Restart TS Server").

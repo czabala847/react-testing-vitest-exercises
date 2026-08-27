@@ -3,7 +3,7 @@ import { afterEach, describe, expect, test, vi } from "vitest"
 import { FirstStepsApp } from "../FirstStepsApp"
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const mockItemCounter = vi.fn((props: unknown) => {
+const mockItemCounter = vi.fn((_props: unknown) => {
   return <div data-testid="item-counter" />;
 });
 
